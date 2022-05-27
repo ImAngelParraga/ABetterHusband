@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "793148888111",
+    "project_id": "a-better-husband",
+    "storage_bucket": "a-better-husband.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:793148888111:android:19c458dc7470fc62daa2da",
+        "android_client_info": {
+          "package_name": "com.example.abetterhusband"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "793148888111-kio55sgrqirjmpfoj686rlb7frhvrkrb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAthNORGqCd4gfjUGRTjb8vmmBAi1dqNBA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "793148888111-kio55sgrqirjmpfoj686rlb7frhvrkrb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:793148888111:android:acbbfd29068019d7daa2da",
+        "android_client_info": {
+          "package_name": "com.example.abetterhusbandv2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "793148888111-kio55sgrqirjmpfoj686rlb7frhvrkrb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAthNORGqCd4gfjUGRTjb8vmmBAi1dqNBA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "793148888111-kio55sgrqirjmpfoj686rlb7frhvrkrb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

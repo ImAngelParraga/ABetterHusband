@@ -19,10 +19,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.abetterhusbandv2.model.HusbandTask
 import com.example.abetterhusbandv2.ui.main.MainViewModel
 import com.example.abetterhusbandv2.ui.theme.ABetterHusbandV2Theme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
@@ -36,8 +39,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(viewModel: MainViewModel) {
-    val husbandTaskList by viewModel.husbandTaskList.observeAsState(listOf())
+fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
+    val husbandTaskList by mainViewModel.husbandTaskList.observeAsState(listOf())
     ABetterHusbandV2Theme {
         // A surface container using the 'background' color from the theme
         Surface(
@@ -61,7 +64,7 @@ fun MainScreen(viewModel: MainViewModel) {
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = {
-                            viewModel.getHusbandTaskList()
+                            mainViewModel.getHusbandTaskList()
                         },
                         backgroundColor = MaterialTheme.colors.primaryVariant
                     ) {
@@ -69,6 +72,7 @@ fun MainScreen(viewModel: MainViewModel) {
                     }
                 },
                 content = {
+                    val modifier = Modifier.padding(it.calculateTopPadding())
                     MainContent(husbandTaskList)
                 }
             )
@@ -141,6 +145,7 @@ fun DefaultPreview() {
                     }
                 },
                 content = {
+                    val modifier = Modifier.padding(it.calculateTopPadding())
                     MainContent()
                 }
             )

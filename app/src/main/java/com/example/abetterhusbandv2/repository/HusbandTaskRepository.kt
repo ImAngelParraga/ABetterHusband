@@ -1,38 +1,28 @@
 package com.example.abetterhusbandv2.repository
 
 import com.example.abetterhusbandv2.model.HusbandTask
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class HusbandTaskRepository @Inject constructor() {
+@Singleton
+class HusbandTaskRepository @Inject constructor(
+    private val husbandTaskList: CollectionReference
+) {
 
-    fun getHusbandTaskList() : List<HusbandTask> {
-        // HusbandTask list is hardcoded for now
-        return listOf(
-            HusbandTask(
-                "Clean the kitchen",
-                "Clean the kitchen",
-                false
-            ),
-            HusbandTask(
-                "Clean the bathroom",
-                "Clean the bathroom",
-                false
-            ),
-            HusbandTask(
-                "Clean the bedroom",
-                "Clean the bedroom",
-                false
-            ),
-            HusbandTask(
-                "Clean the living room",
-                "Clean the living room",
-                false
-            ),
-            HusbandTask(
-                "Clean the kitchen",
-                "Clean the kitchen",
-                false
-            )
-        )
+    fun addHusbandTask(husbandTask: HusbandTask) {
+        husbandTaskList.document(husbandTask.title).set(husbandTask)
+    }
+
+    suspend fun getHusbandTaskList() : List<HusbandTask> {
+        try {
+            return husbandTaskList.get().await().toObjects(HusbandTask::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return emptyList()
     }
 }

@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +24,8 @@ import com.example.abetterhusbandv2.model.HusbandTask
 import com.example.abetterhusbandv2.ui.main.MainViewModel
 import com.example.abetterhusbandv2.ui.theme.ABetterHusbandV2Theme
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.material.Icon
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -40,9 +42,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
-    val husbandTaskList by mainViewModel.husbandTaskList.observeAsState(listOf())
+    val husbandTaskList by mainViewModel.husbandTaskList.collectAsState()
     ABetterHusbandV2Theme {
-        // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colors.background
@@ -56,6 +57,16 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
                                 style = MaterialTheme.typography.h6,
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp)
                             )
+                        },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = {
+                                    mainViewModel.getHusbandTaskList()
+                                },
+                                modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+                            ) {
+                                Icon(Icons.Filled.Refresh, "Refresh")
+                            }
                         },
                         backgroundColor = MaterialTheme.colors.primaryVariant,
                         elevation = 0.dp
@@ -110,12 +121,10 @@ fun MainContent(husbandTaskList: List<HusbandTask> = emptyList()) {
     }
 }
 
-//Jetpack Compose preview
 @Preview
 @Composable
 fun DefaultPreview() {
     ABetterHusbandV2Theme {
-        // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colors.background

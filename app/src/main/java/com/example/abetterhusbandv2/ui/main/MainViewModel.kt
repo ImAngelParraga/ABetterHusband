@@ -17,12 +17,22 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _husbandTasks = MutableStateFlow<List<HusbandTask>>(emptyList())
-    val husbandTaskList: StateFlow<List<HusbandTask>> = _husbandTasks
+    val husbandTaskList: StateFlow<List<HusbandTask>>
+        get() = _husbandTasks
 
     fun getHusbandTaskList() {
         viewModelScope.launch {
-            val hey = husbandTaskRepository.getHusbandTaskList()
-            _husbandTasks.value = hey
+            val list = husbandTaskRepository.getHusbandTaskList()
+            _husbandTasks.value = list
+        }
+    }
+
+    fun changeHusbandTaskStatus(husbandTask: HusbandTask) {
+        viewModelScope.launch {
+            husbandTaskList.value.find { it.title == husbandTask.title }?.let {
+                it.done = !it.done
+            }
+            husbandTaskRepository.changeHusbandTaskStatus(husbandTask)
         }
     }
 

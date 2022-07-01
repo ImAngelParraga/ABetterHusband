@@ -35,8 +35,4 @@ class MainViewModel @Inject constructor(
             husbandTaskRepository.changeHusbandTaskStatus(husbandTask)
         }
     }
-
-    fun addHusbandTask(husbandTask: HusbandTask) {
-        husbandTaskRepository.addHusbandTask(husbandTask)
-    }
 }

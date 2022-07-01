@@ -1,6 +1,8 @@
 package com.example.abetterhusbandv2.ui.main
 
 
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.abetterhusbandv2.model.HusbandTask
@@ -8,6 +10,8 @@ import com.example.abetterhusbandv2.repository.HusbandTaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,11 +24,25 @@ class MainViewModel @Inject constructor(
     val husbandTaskList: StateFlow<List<HusbandTask>>
         get() = _husbandTasks
 
-    fun getHusbandTaskList() {
-        viewModelScope.launch {
-            val list = husbandTaskRepository.getHusbandTaskList()
-            _husbandTasks.value = list
+    init {
+        husbandTaskRepository.getHusbandTaskListSuccessListener { response ->
+            viewModelScope.launch {
+                _husbandTasks.emit(response.toList())
+            }
         }
+
+        husbandTaskRepository.getHusbandTaskList()
+
+        // Another method for realtime updates
+        /*viewModelScope.launch {
+            husbandTaskRepository.getHusbandTaskList().collect {
+                _husbandTasks.value = it
+            }
+        }*/
+    }
+
+    fun getHusbandTaskList() {
+        husbandTaskRepository.getHusbandTaskList()
     }
 
     fun changeHusbandTaskStatus(husbandTask: HusbandTask) {

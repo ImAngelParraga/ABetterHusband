@@ -53,4 +53,10 @@ class MainViewModel @Inject constructor(
             husbandTaskRepository.changeHusbandTaskStatus(husbandTask)
         }
     }
+
+    fun removeHusbandTask(husbandTask: HusbandTask) {
+        viewModelScope.launch {
+            husbandTaskRepository.removeHusbandTask(husbandTask)
+        }
+    }
 }

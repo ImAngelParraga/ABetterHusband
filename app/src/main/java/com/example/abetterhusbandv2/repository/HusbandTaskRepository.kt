@@ -22,6 +22,9 @@ class HusbandTaskRepository @Inject constructor(
         husbandTaskList.document(husbandTask.title).set(husbandTask)
     }
 
+    fun removeHusbandTask(husbandTask: HusbandTask) {
+        husbandTaskList.document(husbandTask.title).delete()
+    }
 
     private var getHusbandTaskListSuccessListener: ((List<HusbandTask>) -> Unit)? = null
 

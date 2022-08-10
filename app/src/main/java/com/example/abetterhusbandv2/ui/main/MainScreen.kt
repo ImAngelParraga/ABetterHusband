@@ -1,36 +1,57 @@
 package com.example.abetterhusbandv2.ui.main
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.abetterhusbandv2.R
 import com.example.abetterhusbandv2.model.HusbandTask
+import com.example.abetterhusbandv2.ui.theme.DialogShapes
+import io.github.farhanroy.composeawesomedialog.InfoHeader
 
 @Composable
 fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () -> Unit = {}) {
     val husbandTaskList by mainViewModel.husbandTaskList.collectAsState()
     if (husbandTaskList.isEmpty()) {
         mainViewModel.getHusbandTaskList()
+    }
+
+    val showDialog by mainViewModel.showInfoDialog.collectAsState()
+    if (showDialog) {
+        InfoDialog(
+            title = "Help",
+            desc = "Click on a task to mark it as done.\n" +
+                    "Swipe left to delete a task.\n" +
+                    "Click on the floating button to add a new task.\n",
+            onDismiss = mainViewModel::changeShowInfoDialogStatus
+        )
     }
 
     Scaffold(
@@ -43,18 +64,16 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
                         modifier = Modifier.padding(start = 16.dp, end = 16.dp)
                     )
                 },
-                navigationIcon = {
+                actions = {
                     IconButton(
                         onClick = {
-                            mainViewModel.getHusbandTaskList()
-                        },
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp)
-                    ) {
-                        Icon(Icons.Filled.Refresh, "Refresh")
+                            mainViewModel.changeShowInfoDialogStatus()
+                        }) {
+                        Icon(imageVector = Icons.Filled.Info, contentDescription = "Info")
                     }
                 },
                 backgroundColor = MaterialTheme.colors.primaryVariant,
-                elevation = 0.dp
+                elevation = 4.dp
             )
         },
         floatingActionButton = {
@@ -195,6 +214,73 @@ fun HusbandTaskItem(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
+            )
+        }
+    }
+}
+
+@Composable
+fun InfoDialog(
+    title: String = "",
+    desc: String = "",
+    onDismiss: () -> Unit,
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            Modifier
+                .width(300.dp)
+        ) {
+            Column(
+                Modifier
+                    .width(300.dp)
+            ) {
+                Spacer(Modifier.height(36.dp))
+                Box(
+                    Modifier
+                        .width(300.dp)
+                        .background(color = Color.White, shape = DialogShapes.large)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            title.uppercase(),
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(desc, style = TextStyle(fontSize = 14.sp))
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Button(
+                                onClick = { onDismiss() },
+                                shape = DialogShapes.large,
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color(
+                                        0xFF02CB6F
+                                    )
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            ) {
+                                Text("Ok", style = TextStyle(color = Color.White))
+                            }
+                        }
+                    }
+                }
+            }
+            InfoHeader(
+                Modifier
+                    .size(72.dp)
+                    .align(Alignment.TopCenter)
+                    .border(
+                        border = BorderStroke(width = 4.dp, color = Color.White),
+                        shape = CircleShape
+                    )
             )
         }
     }

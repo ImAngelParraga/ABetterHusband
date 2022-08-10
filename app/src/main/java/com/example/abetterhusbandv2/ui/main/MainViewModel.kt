@@ -24,6 +24,10 @@ class MainViewModel @Inject constructor(
     val husbandTaskList: StateFlow<List<HusbandTask>>
         get() = _husbandTasks
 
+    private val _showInfoDialog = MutableStateFlow(false)
+    val showInfoDialog: StateFlow<Boolean>
+        get() = _showInfoDialog
+
     init {
         husbandTaskRepository.getHusbandTaskListSuccessListener { response ->
             viewModelScope.launch {
@@ -58,5 +62,9 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             husbandTaskRepository.removeHusbandTask(husbandTask)
         }
+    }
+
+    fun changeShowInfoDialogStatus() {
+        _showInfoDialog.value = !_showInfoDialog.value
     }
 }

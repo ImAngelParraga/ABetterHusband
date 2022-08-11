@@ -37,7 +37,7 @@ import com.example.abetterhusbandv2.ui.theme.DialogShapes
 import io.github.farhanroy.composeawesomedialog.InfoHeader
 
 @Composable
-fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () -> Unit = {}) {
+fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () -> Unit) {
     val husbandTaskList by mainViewModel.husbandTaskList.collectAsState()
     if (husbandTaskList.isEmpty()) {
         mainViewModel.getHusbandTaskList()

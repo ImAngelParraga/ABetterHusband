@@ -20,5 +20,4 @@ object FirestoreModule {
     fun provideHusbandTaskList(
         firestore: FirebaseFirestore
     ) = firestore.collection("Tasks")
-
 }

@@ -7,20 +7,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.example.abetterhusbandv2.ui.theme.ABetterHusbandV2Theme
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.abetterhusbandv2.ui.main.MainScreen
 import com.example.abetterhusbandv2.ui.newHusbandTask.CreateHusbandTaskScreen
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.abetterhusbandv2.ui.login.LoginScreen
+import com.example.abetterhusbandv2.ui.login.LoginViewModel
 import com.example.abetterhusbandv2.ui.main.MainViewModel
 import com.example.abetterhusbandv2.ui.newHusbandTask.CreateHusbandTaskViewModel
-
+import com.example.abetterhusbandv2.ui.splash.SplashScreen
+import com.example.abetterhusbandv2.ui.splash.SplashViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -37,8 +38,6 @@ class MainActivity : ComponentActivity() {
 fun BetterHusbandApp() {
     ABetterHusbandV2Theme {
         val navController: NavHostController = rememberNavController()
-        //val backstackEntry = navController.currentBackStackEntryAsState()
-        //val currentScreen = BetterHusbandScreen.fromRoute(backstackEntry.value?.destination?.route)
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -53,27 +52,39 @@ fun BetterHusbandApp() {
 fun BetterHusbandNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(
         navController = navController,
-        startDestination = BetterHusbandScreen.Main.name,
+        startDestination = SPLASH_SCREEN,
         modifier = modifier
     ) {
-        composable(BetterHusbandScreen.Main.name) {
+        composable(MAIN_SCREEN) {
             val viewModel = hiltViewModel<MainViewModel>()
             MainScreen(
                 mainViewModel = viewModel,
                 newHusbandTask = {
-                    navController.navigate(BetterHusbandScreen.CreateHusbandTask.name)
+                    navController.navigate(CREATE_HUSBAND_TASK_SCREEN)
                 })
         }
 
-        composable(BetterHusbandScreen.CreateHusbandTask.name) {
+        composable(CREATE_HUSBAND_TASK_SCREEN) {
             val viewModel = hiltViewModel<CreateHusbandTaskViewModel>()
             CreateHusbandTaskScreen(
                 createHusbandTaskViewModel = viewModel,
                 onClickedSendButton = {
-                    navController.navigate(
-                        BetterHusbandScreen.Main.name
-                    )
+                    navController.navigate(MAIN_SCREEN)
                 })
+        }
+
+        composable(SPLASH_SCREEN) {
+            val viewModel = hiltViewModel<SplashViewModel>()
+            SplashScreen(
+                splashViewModel = viewModel
+            ) { navController.navigate(MAIN_SCREEN) }
+        }
+
+        composable(LOGIN_SCREEN) {
+            val viewModel = hiltViewModel<LoginViewModel>()
+            LoginScreen(viewModel) {
+                navController.navigate(MAIN_SCREEN)
+            }
         }
     }
 }

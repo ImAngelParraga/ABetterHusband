@@ -23,4 +23,8 @@ class AccountServiceImpl @Inject constructor(
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { onResult(it.exception) }
     }
+
+    override fun hasUser(): Boolean {
+        return auth.currentUser != null
+    }
 }

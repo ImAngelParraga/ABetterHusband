@@ -1,6 +1,7 @@
 package com.example.abetterhusbandv2.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,5 +27,9 @@ class AccountServiceImpl @Inject constructor(
 
     override fun hasUser(): Boolean {
         return auth.currentUser != null
+    }
+
+    override fun getCurrentUser(): FirebaseUser? {
+        return auth.currentUser
     }
 }

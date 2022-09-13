@@ -1,4 +1,5 @@
 package com.example.abetterhusbandv2.model
 
-class TaskList {
+data class TaskList(val listId: String, val wife: String, var husband: String?) {
+    constructor() : this("", "", "")
 }

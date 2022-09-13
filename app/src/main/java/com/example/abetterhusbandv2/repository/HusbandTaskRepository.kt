@@ -3,6 +3,7 @@ package com.example.abetterhusbandv2.repository
 import android.content.ContentValues.TAG
 import android.util.Log
 import com.example.abetterhusbandv2.model.HusbandTask
+import com.example.abetterhusbandv2.model.TaskList
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.toObject
 import javax.inject.Inject
@@ -46,6 +47,10 @@ class HusbandTaskRepository @Inject constructor(
                 getHusbandTaskListSuccessListener?.invoke(list)
             }
         }
+    }
+
+    fun updateTaskListHusband(listId: String, husband: String) {
+        husbandTaskList.document(listId).update("husband", husband)
     }
 
     // Another method for realtime updates

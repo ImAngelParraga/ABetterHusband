@@ -106,7 +106,10 @@ class MainViewModel @Inject constructor(
             _user.value.listId = listID
             userRepository.addOrUpdateUser(_user.value)
 
+            husbandTaskRepository.updateTaskListHusband(listID, _user.value.userId)
             husbandTaskRepository.getHusbandTaskListById(_user.value.listId!!)
+
+            changeShowFollowWifeDialogStatus()
         }
     }
 }

@@ -16,6 +16,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.abetterhusbandv2.ui.main.MainScreen
 import com.example.abetterhusbandv2.ui.newHusbandTask.CreateHusbandTaskScreen
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.abetterhusbandv2.ui.login.LoginScreen
 import com.example.abetterhusbandv2.ui.login.LoginViewModel
 import com.example.abetterhusbandv2.ui.main.MainViewModel
@@ -60,17 +62,22 @@ fun BetterHusbandNavHost(navController: NavHostController, modifier: Modifier = 
             MainScreen(
                 mainViewModel = viewModel,
                 newHusbandTask = {
-                    navController.navigate(CREATE_HUSBAND_TASK_SCREEN)
+                    navController.navigate("$CREATE_HUSBAND_TASK_SCREEN/${viewModel.user.value.listId}")
                 })
         }
 
-        composable(CREATE_HUSBAND_TASK_SCREEN) {
+        composable(
+            "$CREATE_HUSBAND_TASK_SCREEN/{listId}",
+            arguments = listOf(navArgument("listId") { type = NavType.StringType })
+        ) { backStackEntry ->
             val viewModel = hiltViewModel<CreateHusbandTaskViewModel>()
             CreateHusbandTaskScreen(
                 createHusbandTaskViewModel = viewModel,
                 onClickedSendButton = {
                     navController.navigate(MAIN_SCREEN)
-                })
+                },
+                listId = backStackEntry.arguments?.getString("listId")!!
+            )
         }
 
         composable(SPLASH_SCREEN) {

@@ -6,19 +6,21 @@ import com.example.abetterhusbandv2.model.HusbandTask
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.toObject
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
 class HusbandTaskRepository @Inject constructor(
-    private val husbandTaskList: CollectionReference
+    @Named("HusbandTaskList") private val husbandTaskList: CollectionReference
 ) {
 
-    fun addHusbandTask(husbandTask: HusbandTask) {
-        husbandTaskList.document(husbandTask.title).set(husbandTask)
+    fun addOrUpdateHusbandTask(listId: String, husbandTask: HusbandTask) {
+        husbandTaskList.document(listId).collection("list").document(husbandTask.taskId)
+            .set(husbandTask)
     }
 
-    fun removeHusbandTask(husbandTask: HusbandTask) {
-        husbandTaskList.document(husbandTask.title).delete()
+    fun removeHusbandTask(listId: String, husbandTask: HusbandTask) {
+        husbandTaskList.document(listId).collection("list").document(husbandTask.taskId).delete()
     }
 
     private var getHusbandTaskListSuccessListener: ((List<HusbandTask>) -> Unit)? = null
@@ -27,8 +29,8 @@ class HusbandTaskRepository @Inject constructor(
         getHusbandTaskListSuccessListener = success
     }
 
-    fun getHusbandTaskList() {
-        husbandTaskList.addSnapshotListener { value, e ->
+    fun getHusbandTaskListById(listId: String) {
+        husbandTaskList.document(listId).collection("list").addSnapshotListener { value, e ->
             if (e != null) {
                 Log.w(TAG, "listen:error", e)
                 return@addSnapshotListener
@@ -75,7 +77,4 @@ class HusbandTaskRepository @Inject constructor(
         }
     }*/
 
-    fun changeHusbandTaskStatus(husbandTask: HusbandTask) {
-        husbandTaskList.document(husbandTask.title).update("done", husbandTask.done)
-    }
 }

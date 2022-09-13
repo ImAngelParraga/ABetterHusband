@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.abetterhusbandv2.model.LoginUiState
 import com.example.abetterhusbandv2.repository.AccountService
+import com.example.abetterhusbandv2.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,15 +21,5 @@ class LoginViewModel @Inject constructor(
 
     fun onEmailChange(email: String) {
         _uiState.value = _uiState.value.copy(email = email)
-    }
-
-    fun createAnonymousAccount() {
-        viewModelScope.launch {
-            accountService.createAnonymousAccount { error ->
-                if (error == null) {
-
-                }
-            }
-        }
     }
 }

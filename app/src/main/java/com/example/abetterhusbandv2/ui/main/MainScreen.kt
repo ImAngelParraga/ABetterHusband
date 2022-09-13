@@ -14,14 +14,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.List
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,15 +33,27 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.abetterhusbandv2.R
+import com.example.abetterhusbandv2.common.composable.BasicButton
+import com.example.abetterhusbandv2.common.ext.basicButton
+import com.example.abetterhusbandv2.common.ext.fieldModifier
 import com.example.abetterhusbandv2.model.HusbandTask
 import com.example.abetterhusbandv2.ui.theme.DialogShapes
 import io.github.farhanroy.composeawesomedialog.InfoHeader
+import com.example.abetterhusbandv2.R.string as AppText
 
 @Composable
 fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () -> Unit) {
+    val isWife by mainViewModel.isWife.collectAsState()
     val husbandTaskList by mainViewModel.husbandTaskList.collectAsState()
-    if (husbandTaskList.isEmpty()) {
-        mainViewModel.getHusbandTaskList()
+
+    val showFollowWifeDialog by mainViewModel.showFollowWifeDialogStatus.collectAsState()
+    if (showFollowWifeDialog) {
+        FollowListDialog(
+            title = "Follow new list",
+            desc = "You have no list right now. Add a new list ID below and press the button.",
+            onDismiss = mainViewModel::changeShowFollowWifeDialogStatus,
+            onFollowList = mainViewModel::followList
+        )
     }
 
     val showDialog by mainViewModel.showInfoDialog.collectAsState()
@@ -77,13 +90,24 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    newHusbandTask()
-                },
-                backgroundColor = MaterialTheme.colors.primaryVariant
-            ) {
-                Icon(Icons.Filled.Add, "Add new task")
+            if (isWife) {
+                FloatingActionButton(
+                    onClick = {
+                        newHusbandTask()
+                    },
+                    backgroundColor = MaterialTheme.colors.primaryVariant
+                ) {
+                    Icon(Icons.Filled.Add, "Add new task")
+                }
+            } else if (!mainViewModel.userHasList() && !isWife) {
+                FloatingActionButton(
+                    onClick = {
+                        mainViewModel.changeShowFollowWifeDialogStatus()
+                    },
+                    backgroundColor = MaterialTheme.colors.primaryVariant
+                ) {
+                    Icon(Icons.Filled.List, "Follow new list")
+                }
             }
         },
         content = {
@@ -223,7 +247,7 @@ fun HusbandTaskItem(
 fun InfoDialog(
     title: String = "",
     desc: String = "",
-    onDismiss: () -> Unit,
+    onDismiss: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Box(
@@ -282,6 +306,67 @@ fun InfoDialog(
                         shape = CircleShape
                     )
             )
+        }
+    }
+}
+
+@Composable
+fun FollowListDialog(
+    title: String = "",
+    desc: String = "",
+    onDismiss: () -> Unit,
+    onFollowList: (String) -> Unit
+) {
+    var listId by rememberSaveable { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            Modifier
+                .width(300.dp)
+        ) {
+            Column(
+                Modifier
+                    .width(300.dp)
+            ) {
+                Spacer(Modifier.height(36.dp))
+                Box(
+                    Modifier
+                        .width(300.dp)
+                        .background(color = Color.White, shape = DialogShapes.large)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            title.uppercase(),
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(desc, style = TextStyle(fontSize = 14.sp))
+                        Spacer(modifier = Modifier.height(24.dp))
+                        OutlinedTextField(
+                            singleLine = true,
+                            modifier = Modifier.fieldModifier(),
+                            value = listId,
+                            onValueChange = { listId = it },
+                            placeholder = { Text(stringResource(AppText.list_id)) },
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            BasicButton(
+                                text = AppText.follow_list,
+                                modifier = Modifier.basicButton()
+                            ) {
+                                onFollowList(listId)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

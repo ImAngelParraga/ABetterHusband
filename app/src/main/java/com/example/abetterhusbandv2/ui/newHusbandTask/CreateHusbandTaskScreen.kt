@@ -16,12 +16,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.firestore.auth.User
 
 @Composable
 fun CreateHusbandTaskScreen(
     createHusbandTaskViewModel: CreateHusbandTaskViewModel = viewModel(),
-    onClickedSendButton: () -> Unit = {}
+    onClickedSendButton: () -> Unit = {},
+    listId: String
 ) {
+    val title by createHusbandTaskViewModel.title.collectAsState()
+    val description by createHusbandTaskViewModel.description.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -39,7 +44,7 @@ fun CreateHusbandTaskScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    createHusbandTaskViewModel.addHusbandTask()
+                    createHusbandTaskViewModel.addHusbandTask(listId)
                     onClickedSendButton()
                 },
                 backgroundColor = MaterialTheme.colors.primaryVariant
@@ -48,15 +53,12 @@ fun CreateHusbandTaskScreen(
             }
         },
         content = {
-            val title by createHusbandTaskViewModel.title.collectAsState()
-            val description by createHusbandTaskViewModel.description.collectAsState()
-
             CreateHusbandTaskForm(
                 Modifier.padding(it),
                 title,
                 description,
-                { newTitle -> createHusbandTaskViewModel.changeTitle(newTitle) },
-                { newDes -> createHusbandTaskViewModel.changeDescription(newDes) }
+                createHusbandTaskViewModel::changeTitle,
+                createHusbandTaskViewModel::changeDescription
             )
         }
     )

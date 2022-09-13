@@ -10,9 +10,9 @@ class AccountServiceImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : AccountService {
 
-    override fun createAnonymousAccount(onResult: (Throwable?) -> Unit) {
+    override fun createAnonymousAccount(onResult: (Throwable?, String?) -> Unit) {
         auth.signInAnonymously()
-            .addOnCompleteListener { onResult(it.exception) }
+            .addOnCompleteListener { onResult(it.exception, it.result.user?.uid) }
     }
 
     override fun authenticate(email: String, password: String, onResult: (Throwable?) -> Unit) {
@@ -29,7 +29,7 @@ class AccountServiceImpl @Inject constructor(
         return auth.currentUser != null
     }
 
-    override fun getCurrentUser(): FirebaseUser? {
-        return auth.currentUser
+    override fun getCurrentUserId(): String {
+        return auth.currentUser?.uid ?: ""
     }
 }

@@ -147,7 +147,7 @@ fun MainContent(
         ) {
             items(
                 items = husbandTaskList,
-                key = { it.title },
+                key = { it.taskId },
             ) { husbandTask ->
                 val dismissState = rememberDismissState()
 

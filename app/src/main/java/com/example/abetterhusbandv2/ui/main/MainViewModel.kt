@@ -30,7 +30,7 @@ class MainViewModel @Inject constructor(
     val showInfoDialog: StateFlow<Boolean>
         get() = _showInfoDialog
 
-    private val _showFollowWifeDialogStatus = MutableStateFlow(true)
+    private val _showFollowWifeDialogStatus = MutableStateFlow(false)
     val showFollowWifeDialogStatus: StateFlow<Boolean>
         get() = _showFollowWifeDialogStatus
 
@@ -57,6 +57,7 @@ class MainViewModel @Inject constructor(
                 } else {
                     Log.i("Debug", "User has no list")
                 }
+                _showFollowWifeDialogStatus.value = !_isWife.value && _user.value.listId == ""
             }
         }
 

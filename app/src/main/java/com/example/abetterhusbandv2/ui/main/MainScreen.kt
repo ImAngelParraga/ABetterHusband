@@ -42,6 +42,7 @@ import com.example.abetterhusbandv2.R.string as AppText
 fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () -> Unit) {
     val isWife by mainViewModel.isWife.collectAsState()
     val husbandTaskList by mainViewModel.husbandTaskList.collectAsState()
+    val wifeTaskList by mainViewModel.wifeTasks.collectAsState()
 
     val showFollowWifeDialog by mainViewModel.showFollowWifeDialogStatus.collectAsState()
     if (showFollowWifeDialog) {
@@ -115,7 +116,7 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
         content = {
             MainContent(
                 modifier = Modifier.padding(it),
-                husbandTaskList = husbandTaskList,
+                taskList = if (isWife) wifeTaskList else husbandTaskList,
                 onHusbandTaskClick = { husbandTask ->
                     mainViewModel.changeHusbandTaskStatus(husbandTask)
                 },
@@ -131,7 +132,7 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
 @Composable
 fun MainContent(
     modifier: Modifier = Modifier,
-    husbandTaskList: List<HusbandTask> = emptyList(),
+    taskList: List<HusbandTask> = emptyList(),
     onHusbandTaskClick: (HusbandTask) -> Unit,
     onHusbandTaskDismissLeft: (HusbandTask) -> Unit = {},
 ) {
@@ -148,7 +149,7 @@ fun MainContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(
-                items = husbandTaskList,
+                items = taskList,
                 key = { it.taskId },
             ) { husbandTask ->
                 val dismissState = rememberDismissState()

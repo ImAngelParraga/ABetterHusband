@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.abetterhusbandv2.model.HusbandTask
+import com.example.abetterhusbandv2.model.TaskList
 import com.example.abetterhusbandv2.model.User
 import com.example.abetterhusbandv2.repository.AccountService
 import com.example.abetterhusbandv2.repository.HusbandTaskRepository
@@ -42,10 +43,15 @@ class MainViewModel @Inject constructor(
     val user: StateFlow<User>
         get() = _user
 
+    private val _wifeTasks = MutableStateFlow<List<HusbandTask>>(emptyList())
+    val wifeTasks: StateFlow<List<HusbandTask>>
+        get() = _wifeTasks
+
     init {
-        husbandTaskRepository.getHusbandTaskListSuccessListener { response ->
+        husbandTaskRepository.getHusbandTaskListSuccessListener { list, wifeList ->
             viewModelScope.launch {
-                _husbandTasks.emit(response.toList())
+                if (!wifeList) _husbandTasks.emit(list.toList())
+                else _wifeTasks.emit(list.toList())
             }
         }
 
@@ -53,10 +59,11 @@ class MainViewModel @Inject constructor(
             viewModelScope.launch {
                 _user.emit(user)
                 if (_user.value.listId != "") {
-                    husbandTaskRepository.getHusbandTaskListById(_user.value.listId!!)
+                    husbandTaskRepository.getHusbandTaskListById(_user.value.listId!!, false)
                 } else {
                     Log.i("Debug", "User has no list")
                 }
+                husbandTaskRepository.getHusbandTaskListById(_user.value.userId, true)
                 _showFollowWifeDialogStatus.value = !_isWife.value && _user.value.listId == ""
             }
         }
@@ -108,7 +115,7 @@ class MainViewModel @Inject constructor(
             userRepository.addOrUpdateUser(_user.value)
 
             husbandTaskRepository.updateTaskListHusband(listID, _user.value.userId)
-            husbandTaskRepository.getHusbandTaskListById(_user.value.listId!!)
+            husbandTaskRepository.getHusbandTaskListById(_user.value.listId!!, false)
 
             changeShowFollowWifeDialogStatus()
         }
@@ -116,5 +123,9 @@ class MainViewModel @Inject constructor(
 
     fun changeIsWifeStatus() {
         _isWife.value = !_isWife.value
+
+        if (_isWife.value && _wifeTasks.value.isEmpty()) {
+
+        }
     }
 }

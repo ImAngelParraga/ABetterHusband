@@ -19,7 +19,14 @@ class HusbandTaskRepository @Inject constructor(
         husbandTaskList.document(taskList.listId).set(taskList)
     }
 
-    fun addOrUpdateHusbandTask(listId: String, husbandTask: HusbandTask) {
+    fun addHusbandTask(listId: String, husbandTask: HusbandTask) {
+        husbandTaskList.document(listId).collection("list").document().let {
+            husbandTask.taskId = it.id
+            it.set(husbandTask)
+        }
+    }
+
+    fun updateHusbandTask(listId: String, husbandTask: HusbandTask) {
         husbandTaskList.document(listId).collection("list").document(husbandTask.taskId)
             .set(husbandTask)
     }

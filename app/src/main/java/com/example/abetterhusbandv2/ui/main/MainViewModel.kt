@@ -113,4 +113,8 @@ class MainViewModel @Inject constructor(
             changeShowFollowWifeDialogStatus()
         }
     }
+
+    fun changeIsWifeStatus() {
+        _isWife.value = !_isWife.value
+    }
 }

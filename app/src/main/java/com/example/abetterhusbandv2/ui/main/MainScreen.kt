@@ -11,10 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -79,10 +76,15 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
                 },
                 actions = {
                     IconButton(
-                        onClick = {
-                            mainViewModel.changeShowInfoDialogStatus()
-                        }) {
+                        onClick = mainViewModel::changeShowInfoDialogStatus
+                    ) {
                         Icon(imageVector = Icons.Filled.Info, contentDescription = "Info")
+                    }
+                    IconButton(onClick = mainViewModel::changeIsWifeStatus) {
+                        Icon(
+                            imageVector = if (isWife) Icons.Filled.Female else Icons.Filled.Male,
+                            contentDescription = stringResource(AppText.change_isWife)
+                        )
                     }
                 },
                 backgroundColor = MaterialTheme.colors.primaryVariant,

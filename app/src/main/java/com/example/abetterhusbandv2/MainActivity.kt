@@ -62,7 +62,7 @@ fun BetterHusbandNavHost(navController: NavHostController, modifier: Modifier = 
             MainScreen(
                 mainViewModel = viewModel,
                 newHusbandTask = {
-                    navController.navigate("$CREATE_HUSBAND_TASK_SCREEN/${viewModel.user.value.listId}")
+                    navController.navigate("$CREATE_HUSBAND_TASK_SCREEN/${viewModel.user.value.userId}")
                 })
         }
 

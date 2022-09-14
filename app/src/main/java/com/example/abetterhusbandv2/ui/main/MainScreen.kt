@@ -11,10 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -45,6 +42,7 @@ import com.example.abetterhusbandv2.R.string as AppText
 fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () -> Unit) {
     val isWife by mainViewModel.isWife.collectAsState()
     val husbandTaskList by mainViewModel.husbandTaskList.collectAsState()
+    val wifeTaskList by mainViewModel.wifeTasks.collectAsState()
 
     val showFollowWifeDialog by mainViewModel.showFollowWifeDialogStatus.collectAsState()
     if (showFollowWifeDialog) {
@@ -79,10 +77,15 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
                 },
                 actions = {
                     IconButton(
-                        onClick = {
-                            mainViewModel.changeShowInfoDialogStatus()
-                        }) {
+                        onClick = mainViewModel::changeShowInfoDialogStatus
+                    ) {
                         Icon(imageVector = Icons.Filled.Info, contentDescription = "Info")
+                    }
+                    IconButton(onClick = mainViewModel::changeIsWifeStatus) {
+                        Icon(
+                            imageVector = if (isWife) Icons.Filled.Female else Icons.Filled.Male,
+                            contentDescription = stringResource(AppText.change_isWife)
+                        )
                     }
                 },
                 backgroundColor = MaterialTheme.colors.primaryVariant,
@@ -113,7 +116,7 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
         content = {
             MainContent(
                 modifier = Modifier.padding(it),
-                husbandTaskList = husbandTaskList,
+                taskList = if (isWife) wifeTaskList else husbandTaskList,
                 onHusbandTaskClick = { husbandTask ->
                     mainViewModel.changeHusbandTaskStatus(husbandTask)
                 },
@@ -129,7 +132,7 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
 @Composable
 fun MainContent(
     modifier: Modifier = Modifier,
-    husbandTaskList: List<HusbandTask> = emptyList(),
+    taskList: List<HusbandTask> = emptyList(),
     onHusbandTaskClick: (HusbandTask) -> Unit,
     onHusbandTaskDismissLeft: (HusbandTask) -> Unit = {},
 ) {
@@ -146,7 +149,7 @@ fun MainContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(
-                items = husbandTaskList,
+                items = taskList,
                 key = { it.taskId },
             ) { husbandTask ->
                 val dismissState = rememberDismissState()

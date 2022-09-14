@@ -15,6 +15,10 @@ class HusbandTaskRepository @Inject constructor(
     @Named("HusbandTaskList") private val husbandTaskList: CollectionReference
 ) {
 
+    fun createNewTaskList(taskList: TaskList) {
+        husbandTaskList.document(taskList.listId).set(taskList)
+    }
+
     fun addOrUpdateHusbandTask(listId: String, husbandTask: HusbandTask) {
         husbandTaskList.document(listId).collection("list").document(husbandTask.taskId)
             .set(husbandTask)
@@ -24,13 +28,13 @@ class HusbandTaskRepository @Inject constructor(
         husbandTaskList.document(listId).collection("list").document(husbandTask.taskId).delete()
     }
 
-    private var getHusbandTaskListSuccessListener: ((List<HusbandTask>) -> Unit)? = null
+    private var getHusbandTaskListSuccessListener: ((List<HusbandTask>, Boolean) -> Unit)? = null
 
-    fun getHusbandTaskListSuccessListener(success: (List<HusbandTask>) -> Unit) {
+    fun getHusbandTaskListSuccessListener(success: (List<HusbandTask>, Boolean) -> Unit) {
         getHusbandTaskListSuccessListener = success
     }
 
-    fun getHusbandTaskListById(listId: String) {
+    fun getHusbandTaskListById(listId: String, isWife: Boolean) {
         husbandTaskList.document(listId).collection("list").addSnapshotListener { value, e ->
             if (e != null) {
                 Log.w(TAG, "listen:error", e)
@@ -44,13 +48,13 @@ class HusbandTaskRepository @Inject constructor(
                     list.add(doc.toObject())
                 }
 
-                getHusbandTaskListSuccessListener?.invoke(list)
+                getHusbandTaskListSuccessListener?.invoke(list, isWife)
             }
         }
     }
 
     fun updateTaskListHusband(listId: String, husband: String) {
-        husbandTaskList.document(listId).update("husband", husband)
+        husbandTaskList.document(listId).update("husbandId", husband)
     }
 
     // Another method for realtime updates

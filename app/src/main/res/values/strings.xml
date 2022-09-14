@@ -6,4 +6,5 @@
     <string name="sign_in">Sign In</string>
     <string name="list_id">List ID</string>
     <string name="follow_list">Follow List</string>
+    <string name="change_isWife">Change husband or wife status</string>
 </resources>

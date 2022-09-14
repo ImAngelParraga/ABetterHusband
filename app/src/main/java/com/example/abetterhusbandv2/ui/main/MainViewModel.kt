@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.abetterhusbandv2.model.HusbandTask
-import com.example.abetterhusbandv2.model.TaskList
 import com.example.abetterhusbandv2.model.User
 import com.example.abetterhusbandv2.repository.AccountService
 import com.example.abetterhusbandv2.repository.HusbandTaskRepository
@@ -91,7 +90,7 @@ class MainViewModel @Inject constructor(
             husbandTaskList.value.find { it.title == husbandTask.title }?.let {
                 it.done = !it.done
             }
-            husbandTaskRepository.addOrUpdateHusbandTask(_user.value.listId!!, husbandTask)
+            husbandTaskRepository.updateHusbandTask(_user.value.listId!!, husbandTask)
         }
     }
 

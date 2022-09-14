@@ -3,7 +3,6 @@ package com.example.abetterhusbandv2.ui.newHusbandTask
 import androidx.lifecycle.ViewModel
 import com.example.abetterhusbandv2.model.HusbandTask
 import com.example.abetterhusbandv2.repository.HusbandTaskRepository
-import com.example.abetterhusbandv2.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +23,7 @@ class CreateHusbandTaskViewModel @Inject constructor(
 
     fun addHusbandTask(listId: String) {
         val husbandTask = HusbandTask("", _title.value, _description.value, false)
-        husbandTaskRepository.addOrUpdateHusbandTask(listId, husbandTask)
+        husbandTaskRepository.addHusbandTask(listId, husbandTask)
     }
 
     fun changeTitle(newTitle: String) {

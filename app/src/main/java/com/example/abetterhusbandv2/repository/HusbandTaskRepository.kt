@@ -20,10 +20,7 @@ class HusbandTaskRepository @Inject constructor(
     }
 
     fun addHusbandTask(listId: String, husbandTask: HusbandTask) {
-        husbandTaskList.document(listId).collection("list").document().let {
-            husbandTask.taskId = it.id
-            it.set(husbandTask)
-        }
+        husbandTaskList.document(listId).collection("list").document().set(husbandTask)
     }
 
     fun updateHusbandTask(listId: String, husbandTask: HusbandTask) {
@@ -52,7 +49,10 @@ class HusbandTaskRepository @Inject constructor(
                 val list = mutableListOf<HusbandTask>()
 
                 value.forEach { doc ->
-                    list.add(doc.toObject())
+                    doc.toObject<HusbandTask>().run {
+                        taskId = doc.id
+                        list.add(this)
+                    }
                 }
 
                 getHusbandTaskListSuccessListener?.invoke(list, isWife)

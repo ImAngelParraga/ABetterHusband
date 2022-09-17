@@ -122,9 +122,5 @@ class MainViewModel @Inject constructor(
 
     fun changeIsWifeStatus() {
         _isWife.value = !_isWife.value
-
-        if (_isWife.value && _wifeTasks.value.isEmpty()) {
-
-        }
     }
 }

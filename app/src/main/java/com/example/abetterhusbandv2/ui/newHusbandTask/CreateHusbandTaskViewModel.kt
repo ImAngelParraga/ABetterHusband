@@ -21,6 +21,10 @@ class CreateHusbandTaskViewModel @Inject constructor(
     val description: StateFlow<String>
         get() = _description
 
+    private val _titleHasError = MutableStateFlow(false)
+    val titleHasError: StateFlow<Boolean>
+        get() = _titleHasError
+
     fun addHusbandTask(listId: String) {
         val husbandTask = HusbandTask("", _title.value, _description.value, false)
         husbandTaskRepository.addHusbandTask(listId, husbandTask)
@@ -32,5 +36,9 @@ class CreateHusbandTaskViewModel @Inject constructor(
 
     fun changeDescription(newDes: String) {
         _description.value = newDes
+    }
+
+    fun changeTitleHasError() {
+        _titleHasError.value = !_titleHasError.value
     }
 }

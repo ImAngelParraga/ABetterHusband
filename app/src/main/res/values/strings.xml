@@ -7,4 +7,6 @@
     <string name="list_id">List ID</string>
     <string name="follow_list">Follow List</string>
     <string name="change_isWife">Change husband or wife status</string>
+    <string name="create_task">Create Task</string>
+    <string name="newTask_title_error">Title can\'t be empty</string>
 </resources>

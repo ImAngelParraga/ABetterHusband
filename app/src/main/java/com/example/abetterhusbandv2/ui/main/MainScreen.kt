@@ -41,7 +41,7 @@ import com.example.abetterhusbandv2.R.string as AppText
 @Composable
 fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () -> Unit) {
     val isWife by mainViewModel.isWife.collectAsState()
-    val husbandTaskList by mainViewModel.husbandTaskList.collectAsState()
+    val husbandTaskList by mainViewModel.husbandTasks.collectAsState()
     val wifeTaskList by mainViewModel.wifeTasks.collectAsState()
 
     val showFollowWifeDialog by mainViewModel.showFollowWifeDialogStatus.collectAsState()

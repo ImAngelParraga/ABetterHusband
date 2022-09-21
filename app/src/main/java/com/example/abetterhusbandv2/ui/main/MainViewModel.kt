@@ -23,7 +23,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _husbandTasks = MutableStateFlow<List<HusbandTask>>(emptyList())
-    val husbandTaskList: StateFlow<List<HusbandTask>>
+    val husbandTasks: StateFlow<List<HusbandTask>>
         get() = _husbandTasks
 
     private val _showInfoDialog = MutableStateFlow(false)
@@ -85,18 +85,30 @@ class MainViewModel @Inject constructor(
         return _user.value.listId != ""
     }
 
-    fun changeHusbandTaskStatus(husbandTask: HusbandTask) {
+    fun changeHusbandTaskStatus(task: HusbandTask) {
         viewModelScope.launch {
-            husbandTaskList.value.find { it.title == husbandTask.title }?.let {
-                it.done = !it.done
+
+            if (_isWife.value) {
+                _wifeTasks.value.find { it.title == task.title }?.let {
+                    it.done = !it.done
+                }
+                husbandTaskRepository.updateHusbandTask(_user.value.userId, task)
+            } else {
+                _husbandTasks.value.find { it.title == task.title }?.let {
+                    it.done = !it.done
+                }
+                husbandTaskRepository.updateHusbandTask(_user.value.listId!!, task)
             }
-            husbandTaskRepository.updateHusbandTask(_user.value.listId!!, husbandTask)
         }
     }
 
     fun removeHusbandTask(husbandTask: HusbandTask) {
         viewModelScope.launch {
-            husbandTaskRepository.removeHusbandTask(_user.value.listId!!, husbandTask)
+            if (_isWife.value) {
+                husbandTaskRepository.removeHusbandTask(_user.value.userId, husbandTask)
+            } else {
+                husbandTaskRepository.removeHusbandTask(_user.value.listId!!, husbandTask)
+            }
         }
     }
 

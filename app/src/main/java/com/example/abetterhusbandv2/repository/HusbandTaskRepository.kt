@@ -20,12 +20,13 @@ class HusbandTaskRepository @Inject constructor(
     }
 
     fun addHusbandTask(listId: String, husbandTask: HusbandTask) {
-        husbandTaskList.document(listId).collection("list").document().set(husbandTask)
+        husbandTaskList.document(listId).collection("list").document()
+            .set(husbandTask.toHusbandTaskFirebaseDTO())
     }
 
     fun updateHusbandTask(listId: String, husbandTask: HusbandTask) {
         husbandTaskList.document(listId).collection("list").document(husbandTask.taskId)
-            .set(husbandTask)
+            .set(husbandTask.toHusbandTaskFirebaseDTO())
     }
 
     fun removeHusbandTask(listId: String, husbandTask: HusbandTask) {

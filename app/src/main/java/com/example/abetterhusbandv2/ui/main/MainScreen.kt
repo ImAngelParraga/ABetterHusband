@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,7 +42,7 @@ import com.example.abetterhusbandv2.R.string as AppText
 @Composable
 fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () -> Unit) {
     val isWife by mainViewModel.isWife.collectAsState()
-    val husbandTaskList by mainViewModel.husbandTaskList.collectAsState()
+    val husbandTaskList by mainViewModel.husbandTasks.collectAsState()
     val wifeTaskList by mainViewModel.wifeTasks.collectAsState()
 
     val showFollowWifeDialog by mainViewModel.showFollowWifeDialogStatus.collectAsState()
@@ -67,64 +68,123 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "A Better Husband",
-                        style = MaterialTheme.typography.h6,
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp)
-                    )
-                },
-                actions = {
-                    IconButton(
-                        onClick = mainViewModel::changeShowInfoDialogStatus
-                    ) {
-                        Icon(imageVector = Icons.Filled.Info, contentDescription = "Info")
-                    }
-                    IconButton(onClick = mainViewModel::changeIsWifeStatus) {
-                        Icon(
-                            imageVector = if (isWife) Icons.Filled.Female else Icons.Filled.Male,
-                            contentDescription = stringResource(AppText.change_isWife)
-                        )
-                    }
-                },
-                backgroundColor = MaterialTheme.colors.primaryVariant,
-                elevation = 4.dp
+            MainScreenTopAppBar(
+                mainViewModel::changeShowInfoDialogStatus,
+                mainViewModel::changeIsWifeStatus,
+                isWife
             )
         },
         floatingActionButton = {
-            if (isWife) {
-                FloatingActionButton(
-                    onClick = {
-                        newHusbandTask()
-                    },
-                    backgroundColor = MaterialTheme.colors.primaryVariant
-                ) {
-                    Icon(Icons.Filled.Add, "Add new task")
-                }
-            } else if (!mainViewModel.userHasList() && !isWife) {
-                FloatingActionButton(
-                    onClick = {
-                        mainViewModel.changeShowFollowWifeDialogStatus()
-                    },
-                    backgroundColor = MaterialTheme.colors.primaryVariant
-                ) {
-                    Icon(Icons.Filled.List, "Follow new list")
-                }
-            }
-        },
-        content = {
-            MainContent(
-                modifier = Modifier.padding(it),
-                taskList = if (isWife) wifeTaskList else husbandTaskList,
-                onHusbandTaskClick = { husbandTask ->
-                    mainViewModel.changeHusbandTaskStatus(husbandTask)
-                },
-                onHusbandTaskDismissLeft = { husbandTask ->
-                    mainViewModel.removeHusbandTask(husbandTask)
-                }
+            MainScreenFloatingActionButton(
+                isWife,
+                newHusbandTask,
+                mainViewModel::userHasList,
+                mainViewModel::changeShowFollowWifeDialogStatus
             )
         }
+    ) {
+        MainContent(
+            modifier = Modifier.padding(it),
+            taskList = if (isWife) wifeTaskList else husbandTaskList,
+            onHusbandTaskClick = { husbandTask ->
+                mainViewModel.changeHusbandTaskStatus(husbandTask)
+            },
+            onHusbandTaskDismissLeft = { husbandTask ->
+                mainViewModel.removeHusbandTask(husbandTask)
+            }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    val taskList = listOf(
+        HusbandTask(
+            "1",
+            "Título de tarea 1",
+            "Descripción de la primera tarea",
+            false
+        ),
+        HusbandTask(
+            "2",
+            "Título de tarea 2",
+            "Descripción de la segunda tarea",
+            false
+        ),
+        HusbandTask(
+            "3",
+            "Título de tarea 3",
+            "Descripción de la tercera tarea",
+            true
+        )
+    )
+
+    Scaffold(
+        topBar = {
+            MainScreenTopAppBar()
+        },
+        floatingActionButton = {
+            MainScreenFloatingActionButton()
+        }
+    ) {
+        MainContent(modifier = Modifier.padding(it), taskList = taskList)
+    }
+}
+
+@Composable
+fun MainScreenFloatingActionButton(
+    isWife: Boolean = false,
+    newHusbandTask: () -> Unit = {},
+    userHasList: () -> Boolean = { true },
+    changeShowFollowWifeDialogStatus: () -> Unit = {}
+) {
+    if (isWife) {
+        FloatingActionButton(
+            onClick = { newHusbandTask() },
+            backgroundColor = MaterialTheme.colors.primaryVariant
+        ) {
+            Icon(Icons.Filled.Add, "Add new task")
+        }
+    } else if (!userHasList() && !isWife) {
+        FloatingActionButton(
+            onClick = { changeShowFollowWifeDialogStatus() },
+            backgroundColor = MaterialTheme.colors.primaryVariant
+        ) {
+            Icon(Icons.Filled.List, "Follow new list")
+        }
+    }
+}
+
+@Composable
+fun MainScreenTopAppBar(
+    changeShowInfoDialogStatus: () -> Unit = {},
+    changeIsWifeStatus: () -> Unit = {},
+    isWife: Boolean = false
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = "A Better Husband",
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+            )
+        },
+        actions = {
+            IconButton(
+                onClick = changeShowInfoDialogStatus
+            ) {
+                Icon(imageVector = Icons.Filled.Info, contentDescription = "Info")
+            }
+            IconButton(onClick = changeIsWifeStatus) {
+                Icon(
+                    imageVector = if (isWife) Icons.Filled.Female else Icons.Filled.Male,
+                    contentDescription = stringResource(AppText.change_isWife)
+                )
+            }
+        },
+        backgroundColor = MaterialTheme.colors.primaryVariant,
+        elevation = 4.dp
     )
 }
 
@@ -133,7 +193,7 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
 fun MainContent(
     modifier: Modifier = Modifier,
     taskList: List<HusbandTask> = emptyList(),
-    onHusbandTaskClick: (HusbandTask) -> Unit,
+    onHusbandTaskClick: (HusbandTask) -> Unit = {},
     onHusbandTaskDismissLeft: (HusbandTask) -> Unit = {},
 ) {
     Column(
@@ -230,6 +290,7 @@ fun HusbandTaskItem(
                 text = husbandTask.title,
                 style = MaterialTheme.typography.h6,
                 color = Color.White,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 8.dp)

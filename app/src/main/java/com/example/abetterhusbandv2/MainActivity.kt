@@ -3,27 +3,28 @@ package com.example.abetterhusbandv2
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.abetterhusbandv2.ui.theme.ABetterHusbandV2Theme
-import dagger.hilt.android.AndroidEntryPoint
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.abetterhusbandv2.ui.main.MainScreen
-import com.example.abetterhusbandv2.ui.newHusbandTask.CreateHusbandTaskScreen
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.abetterhusbandv2.ui.login.LoginScreen
 import com.example.abetterhusbandv2.ui.login.LoginViewModel
+import com.example.abetterhusbandv2.ui.main.MainScreen
 import com.example.abetterhusbandv2.ui.main.MainViewModel
+import com.example.abetterhusbandv2.ui.newHusbandTask.CreateHusbandTaskScreen
 import com.example.abetterhusbandv2.ui.newHusbandTask.CreateHusbandTaskViewModel
 import com.example.abetterhusbandv2.ui.splash.SplashScreen
 import com.example.abetterhusbandv2.ui.splash.SplashViewModel
+import com.example.abetterhusbandv2.ui.theme.ABetterHusbandV2Theme
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

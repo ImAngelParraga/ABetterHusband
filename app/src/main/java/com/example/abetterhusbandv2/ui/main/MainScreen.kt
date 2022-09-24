@@ -12,8 +12,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -29,23 +32,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.abetterhusbandv2.R
 import com.example.abetterhusbandv2.common.composable.BasicButton
 import com.example.abetterhusbandv2.common.ext.basicButton
 import com.example.abetterhusbandv2.common.ext.fieldModifier
 import com.example.abetterhusbandv2.model.HusbandTask
+import com.example.abetterhusbandv2.model.UserPreferences
 import com.example.abetterhusbandv2.ui.theme.DialogShapes
 import io.github.farhanroy.composeawesomedialog.InfoHeader
 import com.example.abetterhusbandv2.R.string as AppText
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () -> Unit) {
-    val isWife by mainViewModel.isWife.collectAsState()
-    val husbandTaskList by mainViewModel.husbandTasks.collectAsState()
-    val wifeTaskList by mainViewModel.wifeTasks.collectAsState()
+    val userPreferences by mainViewModel.userPreferencesFlow.collectAsStateWithLifecycle(
+        UserPreferences(false)
+    )
+    val isWife = userPreferences.isWife
+    val husbandTaskList by mainViewModel.husbandTasks.collectAsStateWithLifecycle()
+    val wifeTaskList by mainViewModel.wifeTasks.collectAsStateWithLifecycle()
+    val user by mainViewModel.user.collectAsStateWithLifecycle()
 
-    val showFollowWifeDialog by mainViewModel.showFollowWifeDialogStatus.collectAsState()
+    val showFollowWifeDialog by mainViewModel.showFollowWifeDialogStatus.collectAsStateWithLifecycle(
+        !isWife && user.listId?.isBlank() ?: false
+    )
     if (showFollowWifeDialog) {
         FollowListDialog(
             title = "Follow new list",
@@ -55,7 +68,7 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
         )
     }
 
-    val showDialog by mainViewModel.showInfoDialog.collectAsState()
+    val showDialog by mainViewModel.showInfoDialog.collectAsStateWithLifecycle()
     if (showDialog) {
         InfoDialog(
             title = "Help",
@@ -87,10 +100,10 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel(), newHusbandTask: () ->
             modifier = Modifier.padding(it),
             taskList = if (isWife) wifeTaskList else husbandTaskList,
             onHusbandTaskClick = { husbandTask ->
-                mainViewModel.changeHusbandTaskStatus(husbandTask)
+                mainViewModel.changeHusbandTaskStatus(husbandTask, isWife)
             },
             onHusbandTaskDismissLeft = { husbandTask ->
-                mainViewModel.removeHusbandTask(husbandTask)
+                mainViewModel.removeHusbandTask(husbandTask, isWife)
             }
         )
     }
@@ -137,7 +150,7 @@ fun MainScreenFloatingActionButton(
     isWife: Boolean = false,
     newHusbandTask: () -> Unit = {},
     userHasList: () -> Boolean = { true },
-    changeShowFollowWifeDialogStatus: () -> Unit = {}
+    changeShowFollowWifeDialogStatus: (Boolean) -> Unit = {}
 ) {
     if (isWife) {
         FloatingActionButton(
@@ -148,7 +161,7 @@ fun MainScreenFloatingActionButton(
         }
     } else if (!userHasList() && !isWife) {
         FloatingActionButton(
-            onClick = { changeShowFollowWifeDialogStatus() },
+            onClick = { changeShowFollowWifeDialogStatus(false) },
             backgroundColor = MaterialTheme.colors.primaryVariant
         ) {
             Icon(Icons.Filled.List, "Follow new list")
@@ -158,8 +171,8 @@ fun MainScreenFloatingActionButton(
 
 @Composable
 fun MainScreenTopAppBar(
-    changeShowInfoDialogStatus: () -> Unit = {},
-    changeIsWifeStatus: () -> Unit = {},
+    changeShowInfoDialogStatus: (Boolean) -> Unit = {},
+    changeIsWifeStatus: (Boolean) -> Unit = {},
     isWife: Boolean = false
 ) {
     TopAppBar(
@@ -172,11 +185,11 @@ fun MainScreenTopAppBar(
         },
         actions = {
             IconButton(
-                onClick = changeShowInfoDialogStatus
+                onClick = { changeShowInfoDialogStatus(true) }
             ) {
                 Icon(imageVector = Icons.Filled.Info, contentDescription = "Info")
             }
-            IconButton(onClick = changeIsWifeStatus) {
+            IconButton(onClick = { changeIsWifeStatus(!isWife) }) {
                 Icon(
                     imageVector = if (isWife) Icons.Filled.Female else Icons.Filled.Male,
                     contentDescription = stringResource(AppText.change_isWife)
@@ -311,9 +324,9 @@ fun HusbandTaskItem(
 fun InfoDialog(
     title: String = "",
     desc: String = "",
-    onDismiss: () -> Unit
+    onDismiss: (Boolean) -> Unit
 ) {
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = { onDismiss(false) }) {
         Box(
             Modifier
                 .width(300.dp)
@@ -344,7 +357,7 @@ fun InfoDialog(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Button(
-                                onClick = { onDismiss() },
+                                onClick = { onDismiss(false) },
                                 shape = DialogShapes.large,
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = Color(
@@ -378,12 +391,12 @@ fun InfoDialog(
 fun FollowListDialog(
     title: String = "",
     desc: String = "",
-    onDismiss: () -> Unit,
+    onDismiss: (Boolean) -> Unit,
     onFollowList: (String) -> Unit
 ) {
     var listId by rememberSaveable { mutableStateOf("") }
 
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = { onDismiss(false) }) {
         Box(
             Modifier
                 .width(300.dp)

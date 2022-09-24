@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.abetterhusbandv2"
@@ -99,6 +99,13 @@ dependencies {
     // Material Icons Extended
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
 
+    // DataStore
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+    // LiveData
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
+
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha02"
 
     //implementation "androidx.fragment:fragment-ktx:1.5.0"
     //implementation "androidx.activity:activity-ktx:1.4.0"

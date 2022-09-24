@@ -1,3 +1,3 @@
 package com.example.abetterhusbandv2.model
 
-data class UserPreferences()
+data class UserPreferences(val isWife: Boolean)

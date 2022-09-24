@@ -8,6 +8,7 @@ import com.example.abetterhusbandv2.model.HusbandTask
 import com.example.abetterhusbandv2.model.User
 import com.example.abetterhusbandv2.repository.AccountService
 import com.example.abetterhusbandv2.repository.HusbandTaskRepository
+import com.example.abetterhusbandv2.repository.UserPreferencesRepository
 import com.example.abetterhusbandv2.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val husbandTaskRepository: HusbandTaskRepository,
     private val userRepository: UserRepository,
-    accountService: AccountService
+    accountService: AccountService,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _husbandTasks = MutableStateFlow<List<HusbandTask>>(emptyList())
@@ -34,11 +36,9 @@ class MainViewModel @Inject constructor(
     val showFollowWifeDialogStatus: StateFlow<Boolean>
         get() = _showFollowWifeDialogStatus
 
-    private val _isWife = MutableStateFlow(false)
-    val isWife: StateFlow<Boolean>
-        get() = _isWife
+    val userPreferencesFlow = userPreferencesRepository.userPreferencesFlow
 
-    private val _user = MutableStateFlow(User())
+    private val _user = MutableStateFlow(User("", null))
     val user: StateFlow<User>
         get() = _user
 
@@ -63,7 +63,6 @@ class MainViewModel @Inject constructor(
                     Log.i("Debug", "User has no list")
                 }
                 husbandTaskRepository.getHusbandTaskListById(_user.value.userId, true)
-                _showFollowWifeDialogStatus.value = !_isWife.value && _user.value.listId == ""
             }
         }
 
@@ -85,10 +84,10 @@ class MainViewModel @Inject constructor(
         return _user.value.listId != ""
     }
 
-    fun changeHusbandTaskStatus(task: HusbandTask) {
+    fun changeHusbandTaskStatus(task: HusbandTask, isWife: Boolean) {
         viewModelScope.launch {
 
-            if (_isWife.value) {
+            if (isWife) {
                 _wifeTasks.value.find { it.title == task.title }?.let {
                     it.done = !it.done
                 }
@@ -102,9 +101,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun removeHusbandTask(husbandTask: HusbandTask) {
+    fun removeHusbandTask(husbandTask: HusbandTask, isWife: Boolean) {
         viewModelScope.launch {
-            if (_isWife.value) {
+            if (isWife) {
                 husbandTaskRepository.removeHusbandTask(_user.value.userId, husbandTask)
             } else {
                 husbandTaskRepository.removeHusbandTask(_user.value.listId!!, husbandTask)
@@ -112,12 +111,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun changeShowInfoDialogStatus() {
-        _showInfoDialog.value = !_showInfoDialog.value
+    fun changeShowInfoDialogStatus(showInfoDialog: Boolean) {
+        _showInfoDialog.value = showInfoDialog
     }
 
-    fun changeShowFollowWifeDialogStatus() {
-        _showFollowWifeDialogStatus.value = !_showFollowWifeDialogStatus.value
+    fun changeShowFollowWifeDialogStatus(showFollowWifeDialog: Boolean) {
+        _showFollowWifeDialogStatus.value = showFollowWifeDialog
     }
 
     fun followList(listID: String) {
@@ -128,11 +127,13 @@ class MainViewModel @Inject constructor(
             husbandTaskRepository.updateTaskListHusband(listID, _user.value.userId)
             husbandTaskRepository.getHusbandTaskListById(_user.value.listId!!, false)
 
-            changeShowFollowWifeDialogStatus()
+            changeShowFollowWifeDialogStatus(false)
         }
     }
 
-    fun changeIsWifeStatus() {
-        _isWife.value = !_isWife.value
+    fun changeIsWifeStatus(isWife: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateIsWife(isWife)
+        }
     }
 }
